@@ -1,15 +1,13 @@
 import pymongo
 client = pymongo.MongoClient(port=27017)
 db=client["web_project"]
-user_identity = db["user_identity"]
-comment_space = db["comment_space"]
-user_identity_key = tuple(sorted({'username':'','email':'','shadow':''}.keys()))
-comment_space_key = tuple(sorted({'username':'','comment':'','image':''}.keys()))
-collection_map = {
-                user_identity_key:user_identity,
-                comment_space_key:comment_space
-}
-
+collection_map = {}
+def add_table(table_name, key):
+    coll = db[table_name]
+    key = tuple(sorted(key.keys()))
+    collection_map[key]=coll
+add_table("user_identity", {'username':'','email':'','shadow':''})
+add_table("comment_space", {'username':'','comment':'','image':''})
 def nothing(x):
     pass
 

@@ -20,3 +20,19 @@ class Route:
         self.action = action
     def is_request_match(self, request):
         return request.method == self.method and re.search('^'+self.path,request.path)
+    def handle_request(self,request, handler):
+        self.action(request,handler)
+
+if __name__ == "__main__":
+    class Request:
+        def __init__(self,method,path):
+            self.method = method
+            self.path = path
+    def test_func(request,handler):
+        print('t21312est')
+
+
+    r = Router()
+    r.add_route(Route('GET','/hello',test_func))
+    request = Request('GET','/hello')
+    r.handle_request(request,'')
