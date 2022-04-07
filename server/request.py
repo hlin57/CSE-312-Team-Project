@@ -6,10 +6,10 @@ class Request:
             length = get_multipart_length(http_request)
             cur_length = get_current_length(http_request)
             while cur_length < length:
-                data = handle.request.recv(16*1024)
+                data = handler.request.recv(16*1024)
                 cur_length += len(data)
-                print("-----------more data----------:",len(data))
-                request += data
+                print('receiving:',cur_length, '/', length)
+                http_request += data
         self.received_length = len(http_request)
         [request_line, self.header, self.body] = parse_request(http_request)
         [self.method, self.path, self.version] = request_line.decode().split(' ')
