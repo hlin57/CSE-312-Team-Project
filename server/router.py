@@ -1,9 +1,11 @@
 import re
+import os
+from response import generate_response
+from config import *
 class Router:
-    def __init__(self):
-        self.routes = []
-    def add_route(self,route):
-        self.routes.append(route)
+    routes = []
+    def add_route(route):
+        Router.routes.append(route)
     def handle_request(self, request, handler):
         for route in self.routes:
             if route.is_request_match(request):
@@ -23,15 +25,36 @@ class Route:
     def handle_request(self,request, handler):
         self.action(request,handler)
 
-if __name__ == "__main__":
-    class Request:
-        def __init__(self,method,path):
-            self.method = method
-            self.path = path
-    def test_func(request,handler):
-        print('t21312est')
-    Router.add_route(Route('GET','/hello',test_func))
+    
+def home(request, handler):
+    handler.request.sendall(generate_response(b'hello'))
+def css(request, handler):
+    filename = request.path
+    with open(filename,'rb') as css:
+        handler.request.sendall(generate_response(css.read(),'text/css; charset=utf-8'))
+def java_script(request, handler):
+    filename = request.path[request.path.rfind('/')+1:]
+    with open(JS + filename,'rb') as js:
+        handler.request.sendall(generate_response(js.read(),'text/javascript; charset=utf-8'))
 
-    r = Router()
-    request = Request('GET','/hello')
-    r.handle_request(request,'')
+def image(request, handler):
+    filename = request.path[request.path.rfind('/')+1:]
+    with open(IMAGE + filename,'rb') as image:
+        handler.request.sendall(generate_response(image.read(),'image/jpeg'))
+def html(request, handler):
+    filename = request.path[request.path.rfind('/')+1:]
+    print('open:',SRC + filename)
+    with open(SRC + filename,'rb') as html:
+        handler.request.sendall(generate_response(html.read(),'text/html'))
+def signUp(request, handler):
+    html(request, handler)
+def NotFound(request, handler):
+    handler.request.sendall(generate_response(b'content was not found','text/plain','404 Not Found'))
+
+
+Router.add_route(Route('GET','/.*\.html',signUp))
+Router.add_route(Route('GET','/.*\.css',css))
+Router.add_route(Route('GET','/.*\.js',java_script))
+Router.add_route(Route('GET','/.*\.png',image))
+Router.add_route(Route('GET','/.*\.jpg',image))
+Router.add_route(Route('GET','/',home))

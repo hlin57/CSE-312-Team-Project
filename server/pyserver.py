@@ -1,6 +1,7 @@
 import socketserver
 from request import *
 from router import *
+
 class MyTCPHandler(socketserver.BaseRequestHandler):
     """
     The request handler class for our server.
@@ -9,18 +10,16 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     override the handle() method to implement communication to the
     client.
     """
-    def __init__():
-        self.router = Router()
-
+    router = Router()
+        
     def handle(self):
         # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
+        if len(self.data) == 0:
+            return 
         print("{} wrote:".format(self.client_address[0]))
-        print(self.data)
         request = Request(self.data, self)
-
-        self.request.sendall(self.data.upper())
-
+        self.router.handle_request(request, self)
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
 
